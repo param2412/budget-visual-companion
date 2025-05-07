@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
 import AddTransactionForm from "@/components/transactions/AddTransactionForm";
@@ -142,7 +141,7 @@ const Transactions = () => {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {uniqueCategories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -159,7 +158,7 @@ const Transactions = () => {
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="income">Income</SelectItem>
                   <SelectItem value="expense">Expense</SelectItem>
                 </SelectContent>
