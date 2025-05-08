@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Home, PieChart, Wallet, Settings, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import ProfileMenu from '@/components/auth/ProfileMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,9 +13,16 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
   };
 
   const navigationItems = [
@@ -77,19 +86,29 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="p-4 border-t border-sidebar-border">
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground">
-                U
+                {user?.name ? user.name.charAt(0) : "U"}
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium">User</p>
-                <p className="text-xs text-sidebar-foreground/70">user@example.com</p>
+                <p className="text-sm font-medium">{user?.name || "User"}</p>
+                <p className="text-xs text-sidebar-foreground/70">{user?.email || "user@example.com"}</p>
               </div>
             </div>
+            <Button 
+              variant="ghost" 
+              className="w-full mt-2 text-sidebar-foreground"
+              onClick={handleLogout}
+            >
+              Sign Out
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Main content */}
       <div className="flex-1 overflow-auto">
+        <div className="flex justify-end p-4 border-b">
+          <ProfileMenu />
+        </div>
         <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
           {children}
         </main>

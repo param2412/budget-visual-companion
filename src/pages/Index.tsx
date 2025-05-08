@@ -9,10 +9,12 @@ import { Transaction } from "@/lib/types";
 import { transactions } from "@/lib/data";
 import { toast } from "@/components/ui/sonner";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   
   useEffect(() => {
     // Simulate data loading
@@ -36,7 +38,14 @@ const Index = () => {
     <AppLayout>
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            {user && (
+              <p className="text-muted-foreground">
+                Welcome back, {user.name}!
+              </p>
+            )}
+          </div>
           <AddTransactionForm onAddTransaction={handleAddTransaction} />
         </div>
         

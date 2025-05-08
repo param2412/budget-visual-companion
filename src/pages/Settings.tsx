@@ -9,12 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const Settings = () => {
   const { toast } = useToast();
+  const { user, updateProfile, isLoading } = useAuth();
   const [personalInfo, setPersonalInfo] = useState({
-    name: "Demo User",
-    email: "user@example.com",
+    name: user?.name || "Demo User",
+    email: user?.email || "user@example.com",
   });
 
   const [preferences, setPreferences] = useState({
@@ -33,11 +36,13 @@ const Settings = () => {
     setPreferences({ ...preferences, [field]: value });
   };
 
-  const savePersonalInfo = () => {
-    toast({
-      title: "Profile Updated",
-      description: "Your personal information has been saved successfully.",
-    });
+  const savePersonalInfo = async () => {
+    if (await updateProfile({ name: personalInfo.name })) {
+      toast({
+        title: "Profile Updated",
+        description: "Your personal information has been saved successfully.",
+      });
+    }
   };
 
   const savePreferences = () => {
@@ -57,6 +62,7 @@ const Settings = () => {
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -85,19 +91,22 @@ const Settings = () => {
                     type="email"
                     value={personalInfo.email}
                     onChange={handlePersonalInfoChange}
+                    disabled
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                  />
+                  <p className="text-sm text-muted-foreground">Email cannot be changed.</p>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button onClick={savePersonalInfo}>Save Changes</Button>
+                <Button onClick={savePersonalInfo} disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
               </CardFooter>
             </Card>
           </TabsContent>
@@ -201,6 +210,46 @@ const Settings = () => {
                   Category management will be available in a future update.
                 </p>
               </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>
+                  Manage your password and account security.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Current Password</Label>
+                  <Input
+                    id="current-password"
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button>Update Password</Button>
+              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
