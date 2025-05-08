@@ -9,8 +9,9 @@ const ExpenseChart = () => {
   const [categoryData, setCategoryData] = useState<CategoryTotal[]>([]);
   
   useEffect(() => {
+    // Get expense data by category
     const data = getCategoryTotals();
-    setCategoryData(data);
+    setCategoryData(data.filter(item => item.amount > 0));
   }, []);
 
   const formatCurrency = (value: number) => {
@@ -21,6 +22,8 @@ const ExpenseChart = () => {
   };
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+    if (percent < 0.05) return null; // Don't render labels for very small segments
+    
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -47,6 +50,9 @@ const ExpenseChart = () => {
         <div className="bg-white p-2 shadow-lg rounded-md border">
           <p className="font-bold">{payload[0].name}</p>
           <p>{formatCurrency(payload[0].value)}</p>
+          <p className="text-xs text-muted-foreground">
+            {(payload[0].percent * 100).toFixed(1)}% of total
+          </p>
         </div>
       );
     }
@@ -78,7 +84,12 @@ const ExpenseChart = () => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend layout="vertical" verticalAlign="middle" align="right" />
+              <Legend 
+                layout="vertical" 
+                verticalAlign="middle" 
+                align="right" 
+                formatter={(value, entry) => <span className="text-sm">{value}</span>}
+              />
             </PieChart>
           </ResponsiveContainer>
         ) : (

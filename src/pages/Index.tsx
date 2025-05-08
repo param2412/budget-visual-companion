@@ -27,12 +27,8 @@ const Index = () => {
         <BalanceCard />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Suspense fallback={<div>Loading chart...</div>}>
-            <IncomeExpenseChart />
-          </Suspense>
-          <Suspense fallback={<div>Loading chart...</div>}>
-            <ExpenseChart />
-          </Suspense>
+          <IncomeExpenseChart />
+          <ExpenseChart />
         </div>
         
         <TransactionList />
