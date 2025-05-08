@@ -43,8 +43,11 @@ const ProfileMenu = () => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <Button 
+          variant="ghost" 
+          className="relative h-10 w-10 rounded-full overflow-hidden p-0 border-2 border-primary hover:border-primary/80 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-primary/20"
+        >
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary/80 to-primary text-primary-foreground">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -52,25 +55,25 @@ const ProfileMenu = () => {
                 className="h-full w-full rounded-full object-cover"
               />
             ) : (
-              <span className="text-sm font-medium">{getInitials()}</span>
+              <span className="text-sm font-bold">{getInitials()}</span>
             )}
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-56 bg-white/95 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
+        <DropdownMenuLabel className="border-l-2 border-primary">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium">{user.name}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={navigateToSettings} className="cursor-pointer">
-          <Settings className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={navigateToSettings} className="cursor-pointer hover:bg-primary/5 transition-colors">
+          <Settings className="mr-2 h-4 w-4 text-primary" />
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 focus:text-red-500">
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500 focus:text-red-500 hover:bg-red-50 transition-colors">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
