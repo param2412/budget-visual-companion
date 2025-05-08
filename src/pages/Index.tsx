@@ -8,10 +8,19 @@ import AddTransactionForm from "@/components/transactions/AddTransactionForm";
 import { Transaction } from "@/lib/types";
 import { transactions } from "@/lib/data";
 import { toast } from "@/components/ui/sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
   
   const handleAddTransaction = (newTransaction: Transaction) => {
     // In a real app, this would update a database
@@ -34,8 +43,12 @@ const Index = () => {
         <BalanceCard key={`balance-${refreshKey}`} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <IncomeExpenseChart key={`income-expense-${refreshKey}`} />
-          <ExpenseChart key={`expense-${refreshKey}`} />
+          {!loading && (
+            <>
+              <IncomeExpenseChart key={`income-expense-${refreshKey}`} />
+              <ExpenseChart key={`expense-${refreshKey}`} />
+            </>
+          )}
         </div>
         
         <TransactionList key={`transactions-${refreshKey}`} />

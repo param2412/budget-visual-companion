@@ -15,8 +15,21 @@ import {
   Cell 
 } from "recharts";
 import { monthlyData, categories, transactions } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { toast } from "@/components/ui/sonner";
 
 const Reports = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+      toast.success("Reports data loaded successfully");
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Generate monthly trend data
   const monthlyTrend = monthlyData.map(item => ({
     month: item.month,
@@ -44,6 +57,34 @@ const Reports = () => {
     }).format(value);
   };
 
+  const CustomBalanceTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 shadow-lg rounded-md border">
+          <p className="font-bold mb-1">Month: {label}</p>
+          <p className="text-blue-600">Balance: {formatCurrency(payload[0].value)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomCategoryTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const totalExpense = categoryExpenses.reduce((sum, cat) => sum + cat.amount, 0);
+      const percentage = ((payload[0].value / totalExpense) * 100).toFixed(1);
+      
+      return (
+        <div className="bg-white p-3 shadow-lg rounded-md border">
+          <p className="font-bold mb-1">{payload[0].payload.name}</p>
+          <p>Amount: {formatCurrency(payload[0].value)}</p>
+          <p>Percentage: {percentage}%</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <AppLayout>
       <div className="flex flex-col space-y-6">
@@ -54,34 +95,35 @@ const Reports = () => {
             <CardHeader>
               <CardTitle>Monthly Balance Trend</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={monthlyTrend}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" />
-                  <YAxis 
-                    tickFormatter={(value) => `$${value}`} 
-                    width={80}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Balance']} 
-                    labelFormatter={(label) => `Month: ${label}`}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="balance" 
-                    name="Monthly Balance" 
-                    stroke="#3B82F6" 
-                    strokeWidth={3}
-                    dot={{ r: 6 }}
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <CardContent className="h-[calc(100%-80px)]">
+              {!loading && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={monthlyTrend}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="month" />
+                    <YAxis 
+                      tickFormatter={(value) => `$${value}`} 
+                      width={80}
+                    />
+                    <Tooltip content={<CustomBalanceTooltip />} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="balance" 
+                      name="Monthly Balance" 
+                      stroke="#3B82F6" 
+                      strokeWidth={3}
+                      dot={{ r: 6 }}
+                      activeDot={{ r: 8 }}
+                      animationDuration={1000}
+                      isAnimationActive={true}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
           
@@ -89,34 +131,46 @@ const Reports = () => {
             <CardHeader>
               <CardTitle>Category Distribution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={categoryExpenses}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                  <XAxis type="number" tickFormatter={(value) => `$${value}`} />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category" 
-                    width={100}
-                    tickLine={false}
-                  />
-                  <Tooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
-                  <Legend />
-                  <Bar 
-                    dataKey="amount" 
-                    name="Expense Amount"
-                    radius={[0, 4, 4, 0]}
+            <CardContent className="h-[calc(100%-80px)]">
+              {!loading && categoryExpenses.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={categoryExpenses}
+                    layout="vertical"
+                    margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
                   >
-                    {categoryExpenses.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                    <XAxis 
+                      type="number" 
+                      tickFormatter={(value) => `$${value}`} 
+                    />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      width={100}
+                      tickLine={false}
+                    />
+                    <Tooltip content={<CustomCategoryTooltip />} />
+                    <Legend />
+                    <Bar 
+                      dataKey="amount" 
+                      name="Expense Amount"
+                      radius={[0, 4, 4, 0]}
+                      animationDuration={1000}
+                      isAnimationActive={true}
+                    >
+                      {categoryExpenses.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+              {!loading && categoryExpenses.length === 0 && (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">No expense data available</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

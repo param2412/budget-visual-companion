@@ -11,8 +11,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { monthlyData } from "@/lib/data";
+import { useEffect, useState } from "react";
 
 const IncomeExpenseChart = () => {
+  const [chartData, setChartData] = useState(monthlyData);
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    // Force re-render on component mount
+    setKey(prev => prev + 1);
+  }, []);
+
   // Format currency for tooltips
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -47,9 +56,9 @@ const IncomeExpenseChart = () => {
         <CardTitle>Income vs. Expenses</CardTitle>
       </CardHeader>
       <CardContent className="h-[calc(100%-80px)]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" key={`chart-${key}`}>
           <BarChart
-            data={monthlyData}
+            data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -62,12 +71,16 @@ const IncomeExpenseChart = () => {
               name="Income" 
               fill="#10B981" 
               radius={[4, 4, 0, 0]} 
+              animationDuration={1000}
+              isAnimationActive={true}
             />
             <Bar 
               dataKey="expense" 
               name="Expense" 
               fill="#EF4444" 
               radius={[4, 4, 0, 0]} 
+              animationDuration={1000}
+              isAnimationActive={true}
             />
           </BarChart>
         </ResponsiveContainer>
