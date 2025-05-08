@@ -1,5 +1,4 @@
 
-import { Suspense } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import IncomeExpenseChart from "@/components/dashboard/IncomeExpenseChart";
@@ -8,12 +7,20 @@ import TransactionList from "@/components/dashboard/TransactionList";
 import AddTransactionForm from "@/components/transactions/AddTransactionForm";
 import { Transaction } from "@/lib/types";
 import { transactions } from "@/lib/data";
+import { toast } from "@/components/ui/sonner";
+import { useState } from "react";
 
 const Index = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   const handleAddTransaction = (newTransaction: Transaction) => {
     // In a real app, this would update a database
     console.log("Adding transaction:", newTransaction);
     transactions.push(newTransaction);
+    
+    // Force re-render of components
+    setRefreshKey(prev => prev + 1);
+    toast.success("Transaction added successfully");
   };
 
   return (
@@ -24,14 +31,14 @@ const Index = () => {
           <AddTransactionForm onAddTransaction={handleAddTransaction} />
         </div>
         
-        <BalanceCard />
+        <BalanceCard key={`balance-${refreshKey}`} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <IncomeExpenseChart />
-          <ExpenseChart />
+          <IncomeExpenseChart key={`income-expense-${refreshKey}`} />
+          <ExpenseChart key={`expense-${refreshKey}`} />
         </div>
         
-        <TransactionList />
+        <TransactionList key={`transactions-${refreshKey}`} />
       </div>
     </AppLayout>
   );

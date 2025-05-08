@@ -1,9 +1,9 @@
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { getCategoryTotals } from "@/lib/data";
 import { CategoryTotal } from "@/lib/types";
+import { useEffect, useState } from "react";
 
 const ExpenseChart = () => {
   const [categoryData, setCategoryData] = useState<CategoryTotal[]>([]);
@@ -11,7 +11,7 @@ const ExpenseChart = () => {
   useEffect(() => {
     // Get expense data by category
     const data = getCategoryTotals();
-    setCategoryData(data.filter(item => item.amount > 0));
+    setCategoryData(data.filter(item => item.amount > 0).slice(0, 6)); // Limit to top 6 for better visibility
   }, []);
 
   const formatCurrency = (value: number) => {
@@ -47,11 +47,11 @@ const ExpenseChart = () => {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 shadow-lg rounded-md border">
+        <div className="bg-white p-3 shadow-lg rounded-md border">
           <p className="font-bold">{payload[0].name}</p>
           <p>{formatCurrency(payload[0].value)}</p>
           <p className="text-xs text-muted-foreground">
-            {(payload[0].percent * 100).toFixed(1)}% of total
+            {((payload[0].value / categoryData.reduce((sum, item) => sum + item.amount, 0)) * 100).toFixed(1)}% of total
           </p>
         </div>
       );
@@ -64,7 +64,7 @@ const ExpenseChart = () => {
       <CardHeader>
         <CardTitle>Expenses by Category</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-[calc(100%-80px)]">
         {categoryData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
