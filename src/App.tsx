@@ -11,6 +11,8 @@ import Auth from "./pages/Auth";
 import Transactions from "./pages/Transactions";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -30,6 +32,8 @@ const App = () => (
               <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+              <Route path="/privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

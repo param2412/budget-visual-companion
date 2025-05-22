@@ -48,7 +48,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Sidebar backdrop for mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -93,8 +93,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <p className="text-xs text-sidebar-foreground/70">{user?.email || "user@example.com"}</p>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="w-full mt-2 text-sidebar-foreground"
               onClick={handleLogout}
             >
@@ -105,13 +105,37 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto flex flex-col">
         <div className="flex justify-end p-4 border-b">
           <ProfileMenu />
         </div>
-        <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-1">
           {children}
         </main>
+        {/* Footer */}
+        <footer className="bg-sidebar text-sidebar-foreground border-t border-sidebar-border mt-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
+                <Link
+                  to="/terms"
+                  className="text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
+                >
+                  Terms & Conditions
+                </Link>
+                <Link
+                  to="/privacy"
+                  className="text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </div>
+              <div className="text-sm text-sidebar-foreground/70">
+                Made by <span className="font-semibold text-sidebar-primary">P & D Technology</span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
