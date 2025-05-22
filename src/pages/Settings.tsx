@@ -140,12 +140,12 @@ const Settings = () => {
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="INR">INR (₹)</SelectItem>
                       <SelectItem value="USD">USD ($)</SelectItem>
                       <SelectItem value="EUR">EUR (€)</SelectItem>
                       <SelectItem value="GBP">GBP (£)</SelectItem>
                       <SelectItem value="JPY">JPY (¥)</SelectItem>
                       <SelectItem value="CAD">CAD (C$)</SelectItem>
-                      <SelectItem value="INR">INR (₹)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

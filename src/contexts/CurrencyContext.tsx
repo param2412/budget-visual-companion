@@ -8,7 +8,7 @@ interface CurrencyContextType {
 
 // Create context with default values
 const CurrencyContext = createContext<CurrencyContextType>({
-  currency: 'USD',
+  currency: 'INR',
   setCurrency: () => {},
 });
 
@@ -19,10 +19,10 @@ interface CurrencyProviderProps {
 
 // Provider component
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
-  // Initialize with USD or get from localStorage if available
+  // Initialize with INR or get from localStorage if available
   const [currency, setCurrency] = useState<string>(() => {
     const savedCurrency = localStorage.getItem('expenseTracker_currency');
-    return savedCurrency || 'USD';
+    return savedCurrency || 'INR';
   });
 
   // Save currency to localStorage when it changes
