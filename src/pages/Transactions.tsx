@@ -28,10 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, FilterX, Download } from "lucide-react";
+import { Search, FilterX } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { generateTransactionsPDF, downloadPDF } from "@/lib/pdfUtils";
-import { toast } from "@/components/ui/sonner";
 
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState<Transaction[]>(transactions);
@@ -42,7 +40,6 @@ const Transactions = () => {
     dateFrom: "",
     dateTo: "",
   });
-  const [isDownloading, setIsDownloading] = useState(false);
   const { currency } = useCurrency();
 
   const handleAddTransaction = (newTransaction: Transaction) => {
@@ -53,31 +50,7 @@ const Transactions = () => {
     transactions.push(newTransaction);
   };
 
-  const handleDownloadPDF = async () => {
-    setIsDownloading(true);
-    try {
-      const dateRange = filters.dateFrom && filters.dateTo
-        ? `${filters.dateFrom} to ${filters.dateTo}`
-        : "All transactions";
 
-      const doc = await generateTransactionsPDF({
-        transactions: sortedTransactions,
-        currency,
-        title: "Transaction Report",
-        dateRange: dateRange !== "All transactions" ? dateRange : undefined,
-      });
-
-      const filename = `transactions-report-${new Date().toISOString().split('T')[0]}.pdf`;
-      downloadPDF(doc, filename);
-
-      toast.success("PDF report downloaded successfully!");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Failed to generate PDF report. Please try again.");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -219,32 +192,10 @@ const Transactions = () => {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Transaction List</CardTitle>
-                <CardDescription>
-                  {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''} found
-                </CardDescription>
-              </div>
-              <Button
-                onClick={handleDownloadPDF}
-                variant="outline"
-                size="sm"
-                disabled={sortedTransactions.length === 0 || isDownloading}
-              >
-                {isDownloading ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download PDF
-                  </>
-                )}
-              </Button>
-            </div>
+            <CardTitle>Transaction List</CardTitle>
+            <CardDescription>
+              {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''} found
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {sortedTransactions.length > 0 ? (
