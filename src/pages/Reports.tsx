@@ -25,6 +25,7 @@ import { generateReportsPDF, downloadPDF } from "@/lib/pdfUtils";
 
 const Reports = () => {
   const [loading, setLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     // Simulate data loading
@@ -57,9 +58,10 @@ const Reports = () => {
   // Get currency from context
   const { currency } = useCurrency();
 
-  const handleDownloadReportsPDF = () => {
+  const handleDownloadReportsPDF = async () => {
+    setIsDownloading(true);
     try {
-      const doc = generateReportsPDF({
+      const doc = await generateReportsPDF({
         monthlyData,
         categoryData: categoryExpenses,
         currency,
@@ -72,6 +74,8 @@ const Reports = () => {
     } catch (error) {
       console.error("Error generating reports PDF:", error);
       toast.error("Failed to generate reports PDF. Please try again.");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -111,10 +115,19 @@ const Reports = () => {
           <Button
             onClick={handleDownloadReportsPDF}
             variant="outline"
-            disabled={loading}
+            disabled={loading || isDownloading}
           >
-            <Download className="mr-2 h-4 w-4" />
-            Download PDF
+            {isDownloading ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </>
+            )}
           </Button>
         </div>
 

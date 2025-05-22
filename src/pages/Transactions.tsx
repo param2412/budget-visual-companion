@@ -42,6 +42,7 @@ const Transactions = () => {
     dateFrom: "",
     dateTo: "",
   });
+  const [isDownloading, setIsDownloading] = useState(false);
   const { currency } = useCurrency();
 
   const handleAddTransaction = (newTransaction: Transaction) => {
@@ -52,13 +53,14 @@ const Transactions = () => {
     transactions.push(newTransaction);
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
     try {
       const dateRange = filters.dateFrom && filters.dateTo
         ? `${filters.dateFrom} to ${filters.dateTo}`
         : "All transactions";
 
-      const doc = generateTransactionsPDF({
+      const doc = await generateTransactionsPDF({
         transactions: sortedTransactions,
         currency,
         title: "Transaction Report",
@@ -72,6 +74,8 @@ const Transactions = () => {
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF report. Please try again.");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -226,10 +230,19 @@ const Transactions = () => {
                 onClick={handleDownloadPDF}
                 variant="outline"
                 size="sm"
-                disabled={sortedTransactions.length === 0}
+                disabled={sortedTransactions.length === 0 || isDownloading}
               >
-                <Download className="mr-2 h-4 w-4" />
-                Download PDF
+                {isDownloading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download PDF
+                  </>
+                )}
               </Button>
             </div>
           </CardHeader>
