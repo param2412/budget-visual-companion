@@ -74,7 +74,7 @@ const Reports = () => {
       return (
         <div className="bg-white p-3 shadow-lg rounded-md border">
           <p className="font-bold mb-1">{payload[0].payload.name}</p>
-          <p>Amount: {formatCurrency(payload[0].value)}</p>
+          <p>Amount: {formatCurrency(payload[0].value, currency)}</p>
           <p>Percentage: {percentage}%</p>
         </div>
       );
@@ -102,7 +102,16 @@ const Reports = () => {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="month" />
                     <YAxis
-                      tickFormatter={(value) => `$${value}`}
+                      tickFormatter={(value) => {
+                        // Simple formatter for Y-axis that just shows the currency symbol and value
+                        const symbol = currency === 'USD' ? '$' :
+                                      currency === 'EUR' ? '€' :
+                                      currency === 'GBP' ? '£' :
+                                      currency === 'JPY' ? '¥' :
+                                      currency === 'CAD' ? 'C$' :
+                                      currency === 'INR' ? '₹' : '$';
+                        return `${symbol}${value}`;
+                      }}
                       width={80}
                     />
                     <Tooltip content={<CustomBalanceTooltip />} />
@@ -139,7 +148,16 @@ const Reports = () => {
                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                     <XAxis
                       type="number"
-                      tickFormatter={(value) => `$${value}`}
+                      tickFormatter={(value) => {
+                        // Simple formatter for X-axis that just shows the currency symbol and value
+                        const symbol = currency === 'USD' ? '$' :
+                                      currency === 'EUR' ? '€' :
+                                      currency === 'GBP' ? '£' :
+                                      currency === 'JPY' ? '¥' :
+                                      currency === 'CAD' ? 'C$' :
+                                      currency === 'INR' ? '₹' : '$';
+                        return `${symbol}${value}`;
+                      }}
                     />
                     <YAxis
                       dataKey="name"
