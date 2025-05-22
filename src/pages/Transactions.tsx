@@ -28,8 +28,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, FilterX } from "lucide-react";
+import { Search, FilterX, Download } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { generateTransactionsPDF, downloadPDF } from "@/lib/pdfUtils";
+import { toast } from "@/components/ui/sonner";
 
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState<Transaction[]>(transactions);
@@ -40,6 +42,7 @@ const Transactions = () => {
     dateFrom: "",
     dateTo: "",
   });
+  const { currency } = useCurrency();
 
   const handleAddTransaction = (newTransaction: Transaction) => {
     // In a real app, this would update a database
@@ -49,6 +52,29 @@ const Transactions = () => {
     transactions.push(newTransaction);
   };
 
+  const handleDownloadPDF = () => {
+    try {
+      const dateRange = filters.dateFrom && filters.dateTo
+        ? `${filters.dateFrom} to ${filters.dateTo}`
+        : "All transactions";
+
+      const doc = generateTransactionsPDF({
+        transactions: sortedTransactions,
+        currency,
+        title: "Transaction Report",
+        dateRange: dateRange !== "All transactions" ? dateRange : undefined,
+      });
+
+      const filename = `transactions-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      downloadPDF(doc, filename);
+
+      toast.success("PDF report downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF report. Please try again.");
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -56,8 +82,6 @@ const Transactions = () => {
       day: "numeric",
     });
   };
-
-  const { currency } = useCurrency();
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -191,10 +215,23 @@ const Transactions = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Transaction List</CardTitle>
-            <CardDescription>
-              {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''} found
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Transaction List</CardTitle>
+                <CardDescription>
+                  {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''} found
+                </CardDescription>
+              </div>
+              <Button
+                onClick={handleDownloadPDF}
+                variant="outline"
+                size="sm"
+                disabled={sortedTransactions.length === 0}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {sortedTransactions.length > 0 ? (

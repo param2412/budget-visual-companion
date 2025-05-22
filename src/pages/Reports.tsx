@@ -19,6 +19,9 @@ import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/sonner";
 import { formatCurrency } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { generateReportsPDF, downloadPDF } from "@/lib/pdfUtils";
 
 const Reports = () => {
   const [loading, setLoading] = useState(true);
@@ -54,6 +57,24 @@ const Reports = () => {
   // Get currency from context
   const { currency } = useCurrency();
 
+  const handleDownloadReportsPDF = () => {
+    try {
+      const doc = generateReportsPDF({
+        monthlyData,
+        categoryData: categoryExpenses,
+        currency,
+      });
+
+      const filename = `financial-reports-${new Date().toISOString().split('T')[0]}.pdf`;
+      downloadPDF(doc, filename);
+
+      toast.success("Reports PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating reports PDF:", error);
+      toast.error("Failed to generate reports PDF. Please try again.");
+    }
+  };
+
   const CustomBalanceTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -85,7 +106,17 @@ const Reports = () => {
   return (
     <AppLayout>
       <div className="flex flex-col space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+          <Button
+            onClick={handleDownloadReportsPDF}
+            variant="outline"
+            disabled={loading}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download PDF
+          </Button>
+        </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="h-96">
