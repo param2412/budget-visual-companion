@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, FilterX } from "lucide-react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Transactions = () => {
   const [allTransactions, setAllTransactions] = useState<Transaction[]>(transactions);
@@ -56,12 +57,7 @@ const Transactions = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
+  const { currency } = useCurrency();
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -81,21 +77,21 @@ const Transactions = () => {
 
   const filteredTransactions = allTransactions.filter((tx) => {
     // Search filter
-    const searchMatch = !filters.search || 
+    const searchMatch = !filters.search ||
       tx.description.toLowerCase().includes(filters.search.toLowerCase()) ||
       tx.category.toLowerCase().includes(filters.search.toLowerCase());
-    
+
     // Category filter
     const categoryMatch = !filters.category || tx.category === filters.category;
-    
+
     // Type filter
     const typeMatch = !filters.type || tx.type === filters.type;
-    
+
     // Date range filter
-    const dateMatch = 
+    const dateMatch =
       (!filters.dateFrom || tx.date >= filters.dateFrom) &&
       (!filters.dateTo || tx.date <= filters.dateTo);
-    
+
     return searchMatch && categoryMatch && typeMatch && dateMatch;
   });
 
@@ -132,7 +128,7 @@ const Transactions = () => {
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <Select
                 value={filters.category}
                 onValueChange={(value) => handleFilterChange("category", value)}
@@ -149,7 +145,7 @@ const Transactions = () => {
                   ))}
                 </SelectContent>
               </Select>
-              
+
               <Select
                 value={filters.type}
                 onValueChange={(value) => handleFilterChange("type", value)}
@@ -163,7 +159,7 @@ const Transactions = () => {
                   <SelectItem value="expense">Expense</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <div>
                 <Input
                   type="date"
@@ -172,7 +168,7 @@ const Transactions = () => {
                   onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Input
                   type="date"
@@ -180,9 +176,9 @@ const Transactions = () => {
                   value={filters.dateTo}
                   onChange={(e) => handleFilterChange("dateTo", e.target.value)}
                 />
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={resetFilters}
                   title="Clear filters"
                 >
@@ -239,7 +235,7 @@ const Transactions = () => {
                         )}
                       >
                         {transaction.type === "income" ? "+" : "-"}
-                        {formatCurrency(transaction.amount)}
+                        {formatCurrency(transaction.amount, currency)}
                       </TableCell>
                     </TableRow>
                   ))}

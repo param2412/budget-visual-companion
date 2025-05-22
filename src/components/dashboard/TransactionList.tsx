@@ -12,12 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 const TransactionList = () => {
   const [pageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const { currency } = useCurrency();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -27,15 +29,8 @@ const TransactionList = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
-
   // Sort transactions by date (most recent first)
-  const sortedTransactions = [...transactions].sort((a, b) => 
+  const sortedTransactions = [...transactions].sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -52,7 +47,7 @@ const TransactionList = () => {
           <Button variant="link">View All</Button>
         </Link>
       </div>
-      
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -68,15 +63,15 @@ const TransactionList = () => {
               <TableCell>{formatDate(transaction.date)}</TableCell>
               <TableCell>{transaction.description}</TableCell>
               <TableCell>{transaction.category}</TableCell>
-              <TableCell className={cn("text-right", 
+              <TableCell className={cn("text-right",
                 transaction.type === 'income' ? "text-income" : "text-expense")}>
-                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, currency)}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      
+
       {totalPages > 1 && (
         <div className="flex justify-end items-center space-x-2 mt-4">
           <Button

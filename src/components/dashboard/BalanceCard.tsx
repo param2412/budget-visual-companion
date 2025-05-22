@@ -1,18 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { calculateTotalIncome, calculateTotalExpense, calculateBalance } from "@/lib/data";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const BalanceCard = () => {
   const totalIncome = calculateTotalIncome();
   const totalExpense = calculateTotalExpense();
   const balance = calculateBalance();
-  
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
+  const { currency } = useCurrency();
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -33,10 +29,10 @@ const BalanceCard = () => {
           </svg>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-income">{formatCurrency(totalIncome)}</div>
+          <div className="text-2xl font-bold text-income">{formatCurrency(totalIncome, currency)}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
@@ -54,10 +50,10 @@ const BalanceCard = () => {
           </svg>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-expense">{formatCurrency(totalExpense)}</div>
+          <div className="text-2xl font-bold text-expense">{formatCurrency(totalExpense, currency)}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Balance</CardTitle>
@@ -76,7 +72,7 @@ const BalanceCard = () => {
         </CardHeader>
         <CardContent>
           <div className={`text-2xl font-bold ${balance >= 0 ? 'text-income' : 'text-expense'}`}>
-            {formatCurrency(balance)}
+            {formatCurrency(balance, currency)}
           </div>
         </CardContent>
       </Card>

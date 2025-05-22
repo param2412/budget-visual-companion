@@ -10,18 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Loader2 } from "lucide-react";
 
 const Settings = () => {
   const { toast } = useToast();
   const { user, updateProfile, isLoading } = useAuth();
+  const { currency, setCurrency } = useCurrency();
+
   const [personalInfo, setPersonalInfo] = useState({
     name: user?.name || "Demo User",
     email: user?.email || "user@example.com",
   });
 
   const [preferences, setPreferences] = useState({
-    currency: "USD",
+    currency: currency,
     dateFormat: "MM/DD/YYYY",
     theme: "system",
     notifications: true,
@@ -46,6 +49,11 @@ const Settings = () => {
   };
 
   const savePreferences = () => {
+    // Update the global currency context if it has changed
+    if (preferences.currency !== currency) {
+      setCurrency(preferences.currency);
+    }
+
     toast({
       title: "Preferences Updated",
       description: "Your preferences have been saved successfully.",
@@ -100,7 +108,7 @@ const Settings = () => {
                 <Button onClick={savePersonalInfo} disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Saving...
                     </>
                   ) : (
@@ -137,10 +145,11 @@ const Settings = () => {
                       <SelectItem value="GBP">GBP (£)</SelectItem>
                       <SelectItem value="JPY">JPY (¥)</SelectItem>
                       <SelectItem value="CAD">CAD (C$)</SelectItem>
+                      <SelectItem value="INR">INR (₹)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="dateFormat">Date Format</Label>
                   <Select
@@ -160,7 +169,7 @@ const Settings = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="theme">Theme</Label>
                   <Select
@@ -179,7 +188,7 @@ const Settings = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <Label htmlFor="notifications">Notifications</Label>
                   <Switch

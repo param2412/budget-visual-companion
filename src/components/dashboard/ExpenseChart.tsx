@@ -4,26 +4,23 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { getCategoryTotals } from "@/lib/data";
 import { CategoryTotal } from "@/lib/types";
 import { useEffect, useState } from "react";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const ExpenseChart = () => {
   const [categoryData, setCategoryData] = useState<CategoryTotal[]>([]);
-  
+
   useEffect(() => {
     // Get expense data by category
     const data = getCategoryTotals();
     setCategoryData(data.filter(item => item.amount > 0).slice(0, 6)); // Limit to top 6 for better visibility
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
-  };
+  const { currency } = useCurrency();
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     if (percent < 0.05) return null; // Don't render labels for very small segments
-    
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -49,7 +46,7 @@ const ExpenseChart = () => {
       return (
         <div className="bg-white p-3 shadow-lg rounded-md border">
           <p className="font-bold">{payload[0].name}</p>
-          <p>{formatCurrency(payload[0].value)}</p>
+          <p>{formatCurrency(payload[0].value, currency)}</p>
           <p className="text-xs text-muted-foreground">
             {((payload[0].value / categoryData.reduce((sum, item) => sum + item.amount, 0)) * 100).toFixed(1)}% of total
           </p>
@@ -84,10 +81,10 @@ const ExpenseChart = () => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                layout="vertical" 
-                verticalAlign="middle" 
-                align="right" 
+              <Legend
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
                 formatter={(value, entry) => <span className="text-sm">{value}</span>}
               />
             </PieChart>

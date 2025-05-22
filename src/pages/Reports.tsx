@@ -1,22 +1,24 @@
 
 import AppLayout from "@/components/layouts/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar, 
-  Cell 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
 } from "recharts";
 import { monthlyData, categories, transactions } from "@/lib/data";
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/sonner";
+import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Reports = () => {
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ const Reports = () => {
     const total = transactions
       .filter(tx => tx.category === category.name && tx.type === 'expense')
       .reduce((sum, tx) => sum + tx.amount, 0);
-    
+
     return {
       name: category.name,
       amount: total,
@@ -49,20 +51,15 @@ const Reports = () => {
     };
   }).filter(item => item.amount > 0);
 
-  // Format currency for tooltips
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
-  };
+  // Get currency from context
+  const { currency } = useCurrency();
 
   const CustomBalanceTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 shadow-lg rounded-md border">
           <p className="font-bold mb-1">Month: {label}</p>
-          <p className="text-blue-600">Balance: {formatCurrency(payload[0].value)}</p>
+          <p className="text-blue-600">Balance: {formatCurrency(payload[0].value, currency)}</p>
         </div>
       );
     }
@@ -73,7 +70,7 @@ const Reports = () => {
     if (active && payload && payload.length) {
       const totalExpense = categoryExpenses.reduce((sum, cat) => sum + cat.amount, 0);
       const percentage = ((payload[0].value / totalExpense) * 100).toFixed(1);
-      
+
       return (
         <div className="bg-white p-3 shadow-lg rounded-md border">
           <p className="font-bold mb-1">{payload[0].payload.name}</p>
@@ -89,7 +86,7 @@ const Reports = () => {
     <AppLayout>
       <div className="flex flex-col space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
-        
+
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="h-96">
             <CardHeader>
@@ -104,17 +101,17 @@ const Reports = () => {
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="month" />
-                    <YAxis 
-                      tickFormatter={(value) => `$${value}`} 
+                    <YAxis
+                      tickFormatter={(value) => `$${value}`}
                       width={80}
                     />
                     <Tooltip content={<CustomBalanceTooltip />} />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="balance" 
-                      name="Monthly Balance" 
-                      stroke="#3B82F6" 
+                    <Line
+                      type="monotone"
+                      dataKey="balance"
+                      name="Monthly Balance"
+                      stroke="#3B82F6"
                       strokeWidth={3}
                       dot={{ r: 6 }}
                       activeDot={{ r: 8 }}
@@ -126,7 +123,7 @@ const Reports = () => {
               )}
             </CardContent>
           </Card>
-          
+
           <Card className="h-96">
             <CardHeader>
               <CardTitle>Category Distribution</CardTitle>
@@ -140,20 +137,20 @@ const Reports = () => {
                     margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                    <XAxis 
-                      type="number" 
-                      tickFormatter={(value) => `$${value}`} 
+                    <XAxis
+                      type="number"
+                      tickFormatter={(value) => `$${value}`}
                     />
-                    <YAxis 
-                      dataKey="name" 
-                      type="category" 
+                    <YAxis
+                      dataKey="name"
+                      type="category"
                       width={100}
                       tickLine={false}
                     />
                     <Tooltip content={<CustomCategoryTooltip />} />
                     <Legend />
-                    <Bar 
-                      dataKey="amount" 
+                    <Bar
+                      dataKey="amount"
                       name="Expense Amount"
                       radius={[0, 4, 4, 0]}
                       animationDuration={1000}
